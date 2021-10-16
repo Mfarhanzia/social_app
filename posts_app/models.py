@@ -15,3 +15,7 @@ class Posts(models.Model):
 
     def __str__(self):
         return str(self.user.email)
+
+    @classmethod
+    def active_records(cls):
+        return cls.objects.filter(is_deleted=False)

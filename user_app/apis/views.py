@@ -1,8 +1,5 @@
-from functools import partial
-from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import exceptions
-from rest_framework.serializers import Serializer
 from user_app.models import Account as User
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, permission_classes
@@ -14,12 +11,9 @@ from rest_framework_jwt.settings import api_settings
 from django.shortcuts import get_object_or_404
 
 
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-
 @permission_classes((permissions.AllowAny,))
 class UserApis(viewsets.ViewSet):  # User class
+    """this class includes all the basic operations related to user"""
 
     @action(detail=False, methods=['post'])
     def sign_up(self, request):
@@ -37,6 +31,8 @@ class UserApis(viewsets.ViewSet):  # User class
 
     @action(detail=False, methods=['post'])
     def login(self, request):
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         email = request.data.get('email')
         password = request.data.get('password')
         if (email is None) or (password is None):
@@ -64,7 +60,6 @@ class UserApis(viewsets.ViewSet):  # User class
     def update_profile(self, request):
         user_obj = get_object_or_404(User, id=request.user.id)
         serializer = UserSerializer(user_obj)
-        print(request.method)
         if request.method == "PUT":
             serializer = UserSerializer(user_obj, data=request.data, partial=True)
             if serializer.is_valid():
