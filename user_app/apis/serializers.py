@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user_app.models import Account
+from user_app.models import Account, Followers
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -30,9 +30,39 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Account
-        fields = ("profile_image", "username", "email", "first_name", "last_name", "date_joined", "is_active") 
+        fields = (
+            "id", "profile_image", "username", "email", "first_name",
+            "last_name", "date_joined", "is_active"
+        ) 
 
         extra_kwargs = {
             "date_joined": {"read_only": True},
+            "is_active": {"read_only": True},
+        }       
+
+
+class FollowersSerializer(serializers.ModelSerializer):
+    follower = UserSerializer()
+
+    class Meta:
+        model = Followers
+        fields = ("id", "follower", "followed", "followed_on", "updated_at", "is_active")
+
+        extra_kwargs = {
+            "followed_on": {"read_only": True},
+            "updated_at": {"read_only": True},
+            "is_active": {"read_only": True},
+        }       
+
+class FollowingsSerializer(serializers.ModelSerializer):
+    followed = UserSerializer()
+
+    class Meta:
+        model = Followers
+        fields = ("id", "follower", "followed", "followed_on", "updated_at", "is_active")
+
+        extra_kwargs = {
+            "followed_on": {"read_only": True},
+            "updated_at": {"read_only": True},
             "is_active": {"read_only": True},
         }       

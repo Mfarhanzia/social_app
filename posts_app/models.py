@@ -9,6 +9,7 @@ class Posts(models.Model):
     title = models.CharField(max_length=200)
     detail = models.TextField(blank=True, null=True)
     post_image = models.ImageField(upload_to=get_post_file_upload_path, blank=True, null=True)
+    is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
@@ -19,3 +20,10 @@ class Posts(models.Model):
     @classmethod
     def active_records(cls):
         return cls.objects.filter(is_deleted=False)
+
+    @classmethod
+    def get_public_posts(cls):
+        return cls.objects.filter(is_public=True)
+
+    class Meta:
+        verbose_name_plural = 'Posts'
