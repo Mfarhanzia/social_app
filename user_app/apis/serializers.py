@@ -27,12 +27,13 @@ class SignUpSerializer(serializers.ModelSerializer):
 
         
 class UserSerializer(serializers.ModelSerializer):
-    
+    is_following = serializers.CharField(read_only=True, required=False)
+
     class Meta:
         model = Account
         fields = (
             "id", "profile_image", "username", "email", "first_name",
-            "last_name", "date_joined", "is_active"
+            "last_name", "date_joined", "is_active", "is_following"
         ) 
 
         extra_kwargs = {

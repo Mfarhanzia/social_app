@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # custom installed apps
+    'corsheaders',
     'rest_framework',
 
     # my apps
@@ -72,12 +73,6 @@ JWT_AUTH = {
         'JWT_AUTH_HEADER_PREFIX':'JWT'
 }
 
-CORS_ALLOW_CREDENTIALS = True # to accept cookies via ajax request
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000' # the domain for front-end app(you can add more than 1) 
-]
-
-
 AUTH_USER_MODEL = 'user_app.Account'
 
 MIDDLEWARE = [
@@ -88,7 +83,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_CREDENTIALS = True # to accept cookies via ajax request
+ # the domain for front-end app(you can add more than 1)
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:3000', 
+    'http://localhost:3000', 
+)
+
+
 
 ROOT_URLCONF = 'social_app_project.urls'
 
@@ -181,8 +187,9 @@ BASE_API_URL = env('BASE_API_URL')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-
 STATIC_URL = '/static/'
 
+print("BASE_DIR",BASE_DIR)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+print("MEDIA_ROOT",MEDIA_ROOT)
+MEDIA_URL = 'media/'

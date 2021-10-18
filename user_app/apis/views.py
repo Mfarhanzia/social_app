@@ -1,13 +1,17 @@
-from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework import exceptions
-from user_app.models import Account as User, Followers
-from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
-from rest_framework_jwt.settings import api_settings
+from rest_framework.response import Response
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework_jwt.settings import api_settings
+from user_app.utils import calculate_db_response_time
+from user_app.models import Account as User, Followers
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status, permissions
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action, permission_classes
+from django.db.models import Q
 from .serializers import (
     UserSerializer, SignUpSerializer,
     FollowersSerializer, FollowingsSerializer
@@ -46,19 +50,18 @@ class UserApis(viewsets.ViewSet):  # User class
         password = request.data.get('password', None)
         if (email is None) or (password is None):
             raise exceptions.AuthenticationFailed(
-                'email and password required')
+                'Email and Password required')
         user = User.objects.filter(email=email).first()
         if(user is None):
-            raise exceptions.AuthenticationFailed('user not found')
+            raise exceptions.AuthenticationFailed('User not Found!')
         if (not user.check_password(password)):
-            raise exceptions.AuthenticationFailed('wrong password')
+            raise exceptions.AuthenticationFailed('Incorrect Password')
         serialized_user = UserSerializer(user).data
         payload = jwt_payload_handler(user)
         token = jwt_encode_handler(payload)
 
         data = {
-            'access_token': token,
-            'payload': payload,
+            'token': token,
             'user_info': serialized_user,
         }
         return Response(data, status=status.HTTP_200_OK)
@@ -70,7 +73,11 @@ class UserApis(viewsets.ViewSet):  # User class
         user_obj = get_object_or_404(User, id=request.user.id)
         serializer = UserSerializer(user_obj)
         if request.method == "PUT":
-            serializer = UserSerializer(user_obj, data=request.data, partial=True)
+            profile_data = request.data.copy()
+            profile_image = request.data.get("profile_image", None)
+            if profile_image == "":
+                profile_data.pop("profile_image")
+            serializer = UserSerializer(user_obj, data=profile_data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -139,5 +146,29 @@ class UserFollowers(viewsets.ViewSet):
             return Response({"msg": "No Such Following found"}, status=status.HTTP_200_OK)
 
 
-        
+
+class UserCustomPagination(PageNumberPagination):
+    page_size = 2
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class UsersList(generics.ListAPIView):
+    serializer_class = UserSerializer
+    pagination_class = UserCustomPagination
+
+    def get_queryset(self):
+        searched_query = self.request.query_params.get('searched_query', None)
+        print("searched_query", searched_query)
+        filter = Q()
+        if searched_query:
+            searched_query = searched_query.strip()
+            if searched_query:
+                filter = Q(Q(email__icontains=searched_query) | Q(username__icontains=searched_query))
+        query_set = User.objects.filter(filter, is_active=True).extra(select={
+        'is_following': 'SELECT COUNT(*) FROM user_app_followers WHERE ' +
+        'follower_id=%s AND followed_id = user_app_account.id AND is_active=True'
+                                },select_params=(self.request.user.id,))        
+        calculate_db_response_time()
+        return query_set
 

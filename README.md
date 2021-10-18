@@ -8,7 +8,7 @@ python version = 3.7.0
     - DATABASE_NAME=<your_db_name>
     - DATABASE_USER=<database_user_name>
     - DATABASE_PASS=<database_password>
-    - BASE_API_URL=http://127.0.0.1:8000
+    - BASE_API_URL=http://127.0.0.1:8000/api/v1
 
 3- add the postgress database in seetings.py. e.g
     DATABASES = {

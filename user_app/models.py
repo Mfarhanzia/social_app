@@ -53,4 +53,4 @@ class Followers(models.Model):
     @classmethod
     def get_active_followings(cls, user, **kwargs):
         """return the following of current user"""
-        return cls.objects.filter(is_active=True, follower=user, **kwargs).order_by("-followed_on")
+        return cls.objects.filter(is_active=True, follower=user).order_by("-followed_on")

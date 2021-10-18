@@ -9,6 +9,7 @@ class Posts(models.Model):
     title = models.CharField(max_length=200)
     detail = models.TextField(blank=True, null=True)
     post_image = models.ImageField(upload_to=get_post_file_upload_path, blank=True, null=True)
+    # show_to_users = models.ManyToManyField(Account)  #show private posts to these
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -27,3 +28,12 @@ class Posts(models.Model):
 
     class Meta:
         verbose_name_plural = 'Posts'
+
+
+# class NewsFeeds(models.Model):
+#     post_obj = models.ForeignKey(Posts, on_delete=models.CASCADE)
+#     users = models.ManyToManyField(Account)
+#     is_public = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     is_deleted = models.BooleanField(default=False)

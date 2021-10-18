@@ -3,4 +3,10 @@ from user_app.models import Account, Followers
 # Register your models here.
 
 admin.site.register(Account)
-admin.site.register(Followers)
+
+class FollowersAdmin(admin.ModelAdmin):
+    list_display = ("follower", "followed",)
+    list_filter = ("follower", "followed",)
+
+
+admin.site.register(Followers, FollowersAdmin)
