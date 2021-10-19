@@ -57,9 +57,9 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 10,
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
@@ -182,14 +182,12 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BASE_API_URL = env('BASE_API_URL')
-
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 STATIC_URL = '/static/'
 
-print("BASE_DIR",BASE_DIR)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-print("MEDIA_ROOT",MEDIA_ROOT)
 MEDIA_URL = 'media/'

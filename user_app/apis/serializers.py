@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from user_app.models import Account, Followers
+from django.contrib.auth.password_validation import validate_password
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -40,6 +41,20 @@ class UserSerializer(serializers.ModelSerializer):
             "date_joined": {"read_only": True},
             "is_active": {"read_only": True},
         }       
+
+
+class UpdatePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    model = Account
+    
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
 
 
 class FollowersSerializer(serializers.ModelSerializer):

@@ -2,7 +2,6 @@ from django.contrib import admin
 from user_app.models import Account, Followers
 # Register your models here.
 
-admin.site.register(Account)
 
 class FollowersAdmin(admin.ModelAdmin):
     list_display = ("follower", "followed",)
@@ -10,3 +9,10 @@ class FollowersAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Followers, FollowersAdmin)
+
+
+class AccountAdmin(admin.ModelAdmin):
+    readonly_fields = ("password", "date_joined", "last_login",)
+
+
+admin.site.register(Account, AccountAdmin)

@@ -14,18 +14,16 @@ from rest_framework.decorators import action, permission_classes
 from django.db.models import Q
 from .serializers import (
     UserSerializer, SignUpSerializer,
-    FollowersSerializer, FollowingsSerializer
+    FollowersSerializer, FollowingsSerializer,
+    UpdatePasswordSerializer
     )
 
 
 @permission_classes((permissions.AllowAny,))
 class UserApis(viewsets.ViewSet):  # User class
     """
-    this class includes all the basic operations related to user
-    signup
-    login
-    update_profile
-    signout
+    endpoints for
+    signup, login, update_profile and signout
     """
 
     @action(detail=False, methods=['post'])
@@ -86,12 +84,45 @@ class UserApis(viewsets.ViewSet):  # User class
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=['post'])
     def sign_out(self, request):
         logout(request)
         return Response({"msg":"Logged out"}, status=status.HTTP_200_OK)
 
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """
+    An endpoint for changing password.
+    """
+    serializer_class = UpdatePasswordSerializer
+    model = User
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserFollowers(viewsets.ViewSet):
     def list(self, request):
