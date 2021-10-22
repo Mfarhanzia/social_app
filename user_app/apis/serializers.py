@@ -68,7 +68,8 @@ class FollowersSerializer(serializers.ModelSerializer):
             "followed_on": {"read_only": True},
             "updated_at": {"read_only": True},
             "is_active": {"read_only": True},
-        }       
+        }    
+   
 
 class FollowingsSerializer(serializers.ModelSerializer):
     followed = UserSerializer()

@@ -2,7 +2,6 @@ from rest_framework import generics
 from rest_framework import exceptions
 from django.contrib.auth import logout
 from rest_framework.response import Response
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework_jwt.settings import api_settings
 from user_app.utils import calculate_db_response_time
@@ -124,6 +123,7 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserFollowers(viewsets.ViewSet):
     def list(self, request):
         """return list of current user followers"""
@@ -177,11 +177,10 @@ class UserFollowers(viewsets.ViewSet):
             return Response({"msg": "No Such Following found"}, status=status.HTTP_200_OK)
 
 
-
 class UserCustomPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 1000
+    max_page_size = 20
 
 
 class UsersList(generics.ListAPIView):
