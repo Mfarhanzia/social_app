@@ -1,3 +1,4 @@
+from django.http import request
 from rest_framework import generics
 from rest_framework import exceptions
 from django.contrib.auth import logout
@@ -124,20 +125,27 @@ class ChangePasswordView(generics.UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserFollowers(viewsets.ViewSet):
-    def list(self, request):
-        """return list of current user followers"""
-        # queryset = Followers.objects.filter(followed=request.user)
-        queryset = Followers.get_active_followers(request.user)
-        serializer = FollowersSerializer(queryset, many=True)
-        return Response({"followers": serializer.data}, status=status.HTTP_200_OK)
+class UserCustomPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 20
+
+
+class UserFollowActions(viewsets.ViewSet):
     
-    @action(detail=False, methods=['get'])
-    def list_followings(self, request):
-        """return list of current user followings"""
-        queryset = Followers.get_active_followings(request.user)
-        serializer = FollowingsSerializer(queryset, many=True)
-        return Response({"followings": serializer.data}, status=status.HTTP_200_OK)
+    # def list(self, request):
+    #     """return list of current user followers"""
+    #     # queryset = Followers.objects.filter(followed=request.user)
+    #     queryset = Followers.get_active_followers(request.user)
+    #     serializer = FollowersSerializer(queryset, many=True)
+    #     return Response({"followers": serializer.data}, status=status.HTTP_200_OK)
+    
+    # @action(detail=False, methods=['get'])
+    # def list_followings(self, request):
+    #     """return list of current user followings"""
+    #     queryset = Followers.get_active_followings(request.user)
+    #     serializer = FollowingsSerializer(queryset, many=True)
+    #     return Response({"followings": serializer.data}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['put'])
     def unfollow(self, request):
@@ -159,6 +167,7 @@ class UserFollowers(viewsets.ViewSet):
         if (follow_id is None):
             return Response({"msg": "follow to required"}, status=status.HTTP_400_BAD_REQUEST)
         is_user = User.objects.filter(id=follow_id).exists()
+        print("is_user", is_user)
         if not is_user:
             return Response({"msg": "No Such User Found"}, status=status.HTTP_404_NOT_FOUND)
         is_obj = Followers.objects.filter(follower=request.user, followed_id=follow_id).exists()
@@ -174,13 +183,27 @@ class UserFollowers(viewsets.ViewSet):
         else:
             new_obj = Followers.objects.create(follower=request.user, followed_id=follow_id)
             msg = "Started Following {}".format(new_obj.followed.email)
-            return Response({"msg": "No Such Following found"}, status=status.HTTP_200_OK)
+            return Response({"msg": msg}, status=status.HTTP_200_OK)
 
 
-class UserCustomPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 20
+class UserFollowers(generics.ListAPIView):
+    serializer_class = FollowersSerializer
+    pagination_class = UserCustomPagination 
+
+    def get_queryset(self):
+        """return list of current user followers"""
+        queryset = Followers.get_active_followers(self.request.user)
+        return queryset
+
+
+class UserFollowing(generics.ListAPIView):
+    serializer_class = FollowingsSerializer
+    pagination_class = UserCustomPagination 
+
+    def get_queryset(self):
+        """return list of current user followings"""
+        queryset = Followers.get_active_followings(self.request.user)
+        return queryset
 
 
 class UsersList(generics.ListAPIView):
@@ -195,7 +218,7 @@ class UsersList(generics.ListAPIView):
             searched_query = searched_query.strip()
             if searched_query:
                 filter = Q(Q(email__icontains=searched_query) | Q(username__icontains=searched_query))
-        query_set = User.objects.filter(filter, is_active=True).extra(select={
+        query_set = User.objects.filter(filter, is_active=True).exclude(id=self.request.user.id).extra(select={
         'is_following': 'SELECT COUNT(*) FROM user_app_followers WHERE ' +
         'follower_id=%s AND followed_id = user_app_account.id AND is_active=True'
                                 },select_params=(self.request.user.id,))        

@@ -6,7 +6,7 @@ from posts_app.utils import get_post_file_upload_path
 # Create your models here.
 
 class Posts(models.Model):
-    user = models.ForeignKey(Account, related_name="post_by", on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, related_name="user", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     detail = models.TextField(blank=True, null=True)
     post_image = models.ImageField(upload_to=get_post_file_upload_path, blank=True, null=True)
