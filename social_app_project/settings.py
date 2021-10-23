@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+import environ
+
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-y^=0a^iz^@sk37bcuk_a!k&f+_&jxph!#vg%)bfkt#4hep)v(q'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -41,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # custom installed apps
+    'corsheaders',
     'rest_framework',
 
     # my apps
@@ -51,9 +57,9 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 10,
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
@@ -67,12 +73,6 @@ JWT_AUTH = {
         'JWT_AUTH_HEADER_PREFIX':'JWT'
 }
 
-CORS_ALLOW_CREDENTIALS = True # to accept cookies via ajax request
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000' # the domain for front-end app(you can add more than 1) 
-]
-
-
 AUTH_USER_MODEL = 'user_app.Account'
 
 MIDDLEWARE = [
@@ -83,7 +83,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_CREDENTIALS = True # to accept cookies via ajax request
+ # the domain for front-end app(you can add more than 1)
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:3000', 
+    'http://localhost:3000', 
+)
+
+
 
 ROOT_URLCONF = 'social_app_project.urls'
 
@@ -119,14 +130,13 @@ WSGI_APPLICATION = 'social_app_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'social_app_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASS'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -171,15 +181,13 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-BASE_API_URL = "http://127.0.0.1:8000"
-
-
+BASE_API_URL = env('BASE_API_URL')
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'

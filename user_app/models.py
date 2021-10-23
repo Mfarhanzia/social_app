@@ -1,44 +1,11 @@
-import os
 from PIL import Image
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db.models.deletion import CASCADE
+from django.contrib.auth.models import AbstractUser
 from user_app.utils import get_upload_path
+from user_app.managers import CustomUserManager
+from django.utils.translation import ugettext_lazy as _
 # Create your models here.
-
-
-class CustomUserManager(BaseUserManager):
-    """
-    Custom user Account model manager where email is the unique identifiers
-    for authentication instead of usernames.
-    """
-    def create_user(self, email, password, **extra_fields):
-        """
-        save and create a User with the given email and password.
-        """
-        if not email:
-            raise ValueError(_('The Email must be set'))
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def create_superuser(self, email, password, **extra_fields):
-        """
-        save and create a SuperUser with the given email and password.
-        """
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
-        return self.create_user(email, password, **extra_fields)
-
 
 
 class Account(AbstractUser):
@@ -50,16 +17,43 @@ class Account(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-    # class Meta:
-    #     verbose
+    
+    class Meta:
+        verbose_name_plural = 'Accounts'
+
     def __str__(self):
         return self.email
     
-    def save(self):
-        super().save()
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.profile_image:
-            img = Image.open(self.profile_image.path)    
-            if img.height > 300 or img.width > 300:
-                output_size = (300,300)
-                img.thumbnail(output_size)
-                img.save(self.profile_image.path)
+            try:
+                img = Image.open(self.profile_image.path)    
+                if img.height > 300 or img.width > 300:
+                    output_size = (300,300)
+                    img.thumbnail(output_size)
+                    img.save(self.profile_image.path)
+            except Exception as e:
+                pass
+
+
+class Followers(models.Model):
+    follower = models.ForeignKey(Account, on_delete=CASCADE, related_name="follower")
+    followed = models.ForeignKey(Account, on_delete=CASCADE, related_name="followed")
+    followed_on = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = 'Followers'
+        unique_together = (('follower', 'followed'),) 
+    
+    @classmethod
+    def get_active_followers(cls, user):
+        """return the followers of current """
+        return cls.objects.filter(is_active=True, followed=user).order_by("-followed_on")
+
+    @classmethod
+    def get_active_followings(cls, user, **kwargs):
+        """return the following of current user"""
+        return cls.objects.filter(is_active=True, follower=user).order_by("-followed_on")

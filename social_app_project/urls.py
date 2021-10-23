@@ -30,5 +30,4 @@ urlpatterns = [
     # my apps urls
     path("api/v1/user/", include('user_app.apis.urls')),
     path("api/v1/posts/", include('posts_app.apis.urls'))
-]
-#  + static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
