@@ -12,7 +12,7 @@ python version = 3.7.0
             <li>DATABASE_USER=database_user_name</li>
             <li>DATABASE_USER=database_user_name</li>
             <li>DATABASE_PASS=<database_password></li>
-            <li>BASE_API_URL=http://127.0.0.1:<port>/api/v1</li>
+            <li>BASE_API_URL=http://127.0.0.1:port/api/v1</li>
         </ul>
         <p><b>You can set the following values of .env variables</b></P>
         <ul>
