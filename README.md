@@ -13,7 +13,7 @@ python version = 3.7.0
             <li>DATABASE_PASS=<database_password></li>
             <li>BASE_API_URL=http://127.0.0.1:<port>/api/v1</li>
         </ul>
-        <p><b>You can set the following values of .env varialbles</b></P>
+        <p><b>You can set the following values of .env variables</b></P>
         <ul>
             <li>SECRET_KEY=django-insecure-y^=0a^iz^@sk37bcuk_a!k&f+_&jxph!#vg%)bfkt#4hep)v(q</li>
             <li>DATABASE_NAME=you_db_name</li>
@@ -23,22 +23,22 @@ python version = 3.7.0
         </ul>
     </li>
 
-    <li>Add the postgress database in settings.py. e.g<br/>
-        DATABASES = {<br/>
-            'default': {<br/>
-                'ENGINE': 'django.db.backends.postgresql_psycopg2',<br/>
-                'NAME': env('DATABASE_NAME'),<br/>
-                'USER': env('DATABASE_USER'),<br/>
-                'PASSWORD': env('DATABASE_PASS'),<br/>
-                'HOST': 'localhost',<br/>
-                'PORT': '5432',<br/>
-            }<br/>
+<li>Add the postgress database in settings.py. e.g<br/>
+    DATABASES = {<br/>
+        'default': {<br/>
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',<br/>
+            'NAME': env('DATABASE_NAME'),<br/>
+            'USER': env('DATABASE_USER'),<br/>
+            'PASSWORD': env('DATABASE_PASS'),<br/>
+            'HOST': 'localhost',<br/>
+            'PORT': '5432',<br/>
         }<br/>
-    </li>
+    }<br/>
+</li>
     <li>After connecting the database apply the migrations using "python manage.py migrate" command</li>
     <li>After migrations load dummy data to data using "python manage.py loaddata db_data.json" command.
-    <p>Super Admin email: admin@admin.com</p>
-    <p>Super Admin Password: Password@1</p>
-    </li>
+        <p>Super Admin email: admin@admin.com</p>
+        <p>Super Admin Password: Password@1</p>
+<   /li>
 </ol>
 
