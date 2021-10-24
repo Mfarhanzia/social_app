@@ -5,7 +5,8 @@ from .serializers import PostsSerializer
 from user_app.models import Account as User
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-import time
+
+
 class PostsCustomPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
