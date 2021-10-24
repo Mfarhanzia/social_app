@@ -41,5 +41,6 @@ python version = 3.7.0
         <p>Super Admin email: admin@admin.com</p>
         <p>Super Admin Password: Password@1</p>
     </li>
+    <li>Last step run the server using "python manage.py runserver" command and access the admin panel at http://127.0.0.1:8000/admin and login using the above given credentials</li>
 </ol>
 
