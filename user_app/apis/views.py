@@ -1,4 +1,4 @@
-from django.http import request
+import after_response
 from rest_framework import generics
 from rest_framework import exceptions
 from django.contrib.auth import logout
@@ -12,6 +12,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action, permission_classes
 from django.db.models import Q
+from posts_app.models import Posts
 from .serializers import (
     UserSerializer, SignUpSerializer,
     FollowersSerializer, FollowingsSerializer,
@@ -133,20 +134,6 @@ class UserCustomPagination(PageNumberPagination):
 
 class UserFollowActions(viewsets.ViewSet):
     
-    # def list(self, request):
-    #     """return list of current user followers"""
-    #     # queryset = Followers.objects.filter(followed=request.user)
-    #     queryset = Followers.get_active_followers(request.user)
-    #     serializer = FollowersSerializer(queryset, many=True)
-    #     return Response({"followers": serializer.data}, status=status.HTTP_200_OK)
-    
-    # @action(detail=False, methods=['get'])
-    # def list_followings(self, request):
-    #     """return list of current user followings"""
-    #     queryset = Followers.get_active_followings(request.user)
-    #     serializer = FollowingsSerializer(queryset, many=True)
-    #     return Response({"followings": serializer.data}, status=status.HTTP_200_OK)
-
     @action(detail=False, methods=['put'])
     def unfollow(self, request):
         """unfollow user"""
@@ -156,6 +143,8 @@ class UserFollowActions(viewsets.ViewSet):
         queryset = Followers.objects.filter(follower=request.user, followed_id=unfollow_id, is_active=True)
         if queryset:
             queryset.update(is_active=False)
+            print("im here")
+            self.after_follow_action.after_response(request.user.id, unfollow_id, False)
             return Response({"msg": "Unfollowed"}, status=status.HTTP_200_OK)
         else:
             return Response({"msg": "No Such Following found"}, status=status.HTTP_404_NOT_FOUND)
@@ -176,14 +165,31 @@ class UserFollowActions(viewsets.ViewSet):
             if follower_obj.is_active:
                 return Response({"msg": "Already Following"}, status=status.HTTP_200_OK)
             else:
+                self.after_follow_action.after_response(request.user.id, follow_id, True)
                 follower_obj.is_active = True
                 follower_obj.save()
                 msg = "Started Following {}".format(follower_obj.followed.email)
                 return Response({"msg": msg}, status=status.HTTP_200_OK)
         else:
+            self.after_follow_action.after_response(request.user.id, follow_id, True)
             new_obj = Followers.objects.create(follower=request.user, followed_id=follow_id)
             msg = "Started Following {}".format(new_obj.followed.email)
             return Response({"msg": msg}, status=status.HTTP_200_OK)
+
+
+    @after_response.enable
+    def after_follow_action(current_user_id, follow_id, is_follow):
+        follow_to_user = User.objects.get(id=follow_id)
+        all_posts = Posts.my_posts(follow_to_user)
+        all_posts_instances = []
+        ThroughModel  = Posts.show_to_users.through
+        for post in all_posts:
+            if is_follow:
+                all_posts_instances.append(ThroughModel(account_id=current_user_id, posts_id=post.pk))
+            else:
+                post.show_to_users.remove(current_user_id)
+        if is_follow:
+            ThroughModel.objects.bulk_create(all_posts_instances, batch_size=100)
 
 
 class UserFollowers(generics.ListAPIView):

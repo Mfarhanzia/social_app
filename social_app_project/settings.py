@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # custom installed apps
     'corsheaders',
     'rest_framework',
+    'after_response',
 
     # my apps
     "user_app.apps.UserAppConfig",

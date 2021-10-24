@@ -33,7 +33,7 @@ class Posts(models.Model):
     
     @classmethod
     def get_feeds(cls, user):
-        return cls.objects.filter(Q(is_public=True) | Q(show_to_users=user) | Q(user=user), is_deleted=False).order_by("-created_at")
+        return cls.objects.filter(Q(is_public=True) | Q(show_to_users=user) | Q(user=user), is_deleted=False).distinct().order_by("-created_at")
     
     class Meta:
         verbose_name_plural = 'Posts'

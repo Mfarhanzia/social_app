@@ -1,5 +1,6 @@
 asgiref==3.4.1
 Django==3.2.8
+django-after-response==0.2.2
 django-cors-headers==3.10.0
 django-environ==0.8.1
 django-rest-framework-nested==0.0.1
