@@ -1,8 +1,9 @@
 # social_app
 python version = 3.7.0
 <ol>
-    <li>Create virtualenv and activate it.(optional)</li> 
-    <li>Install the requirement file using "pip install -r requirements.txt"</li>
+    <li>Create a virtualenv and activate it.(optional)</li> 
+    <li>cd to project folder</li> 
+    <li>Install the requirements using "pip install -r requirements.txt"</li>
     <li>Create a postgres database</li>
     <li>Create .env file in project folder(social_app_project) and set the value of following variables (for the convenience I have given my .env variables values )
         <ul>
@@ -39,6 +40,6 @@ python version = 3.7.0
     <li>After migrations load dummy data to data using "python manage.py loaddata db_data.json" command.
         <p>Super Admin email: admin@admin.com</p>
         <p>Super Admin Password: Password@1</p>
-<   /li>
+    </li>
 </ol>
 
