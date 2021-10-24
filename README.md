@@ -1,36 +1,44 @@
 # social_app
 python version = 3.7.0
 <ol>
-<li>1- create virtualenv and activate it.(optional)</li> 
-<li>2- install the requirement file using "pip install -r requirements.txt"</li>
-<li>3- create a postgres database</li>
-<li>4- create .env file in project folder(social_app_project) and set the value of following variables (for the convenience I have given my .env variables values )
-    <ul>
-        <li>SECRET_KEY=<your_django_secret_key></li>
-        <li>DATABASE_NAME=your_db_name</li>
-        <li>DATABASE_USER=database_user_name</li>
-        <li>DATABASE_USER=database_user_name</li>
-        <li>DATABASE_PASS=<database_password></li>
-        <li>BASE_API_URL=http://127.0.0.1:8000/api/v1</li>
-    </ul>
-    <p>You can set the following values of .env varialbles</P>
-    SECRET_KEY=django-insecure-y^=0a^iz^@sk37bcuk_a!k&f+_&jxph!#vg%)bfkt#4hep)v(q
-    DATABASE_NAME=social_app_db
-    DATABASE_USER=postgres
-    DATABASE_PASS=admin
-    BASE_API_URL=http://127.0.0.1:8000
-</li>
+    <li>Create virtualenv and activate it.(optional)</li> 
+    <li>Install the requirement file using "pip install -r requirements.txt"</li>
+    <li>Create a postgres database</li>
+    <li>Create .env file in project folder(social_app_project) and set the value of following variables (for the convenience I have given my .env variables values )
+        <ul>
+            <li>SECRET_KEY=<your_django_secret_key></li>
+            <li>DATABASE_NAME=your_db_name</li>
+            <li>DATABASE_USER=database_user_name</li>
+            <li>DATABASE_USER=database_user_name</li>
+            <li>DATABASE_PASS=<database_password></li>
+            <li>BASE_API_URL=http://127.0.0.1:<port>/api/v1</li>
+        </ul>
+        <p><b>You can set the following values of .env varialbles</b></P>
+        <ul>
+            <li>SECRET_KEY=django-insecure-y^=0a^iz^@sk37bcuk_a!k&f+_&jxph!#vg%)bfkt#4hep)v(q</li>
+            <li>DATABASE_NAME=you_db_name</li>
+            <li>DATABASE_USER=postgres</li>
+            <li>DATABASE_PASS=admin</li>
+            <li>BASE_API_URL=http://127.0.0.1:8000</li>
+        </ul>
+    </li>
 
-<li>5-Add the postgress database in seetings.py. e.g
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': env('DATABASE_NAME'),
-            'USER': env('DATABASE_USER'),
-            'PASSWORD': env('DATABASE_PASS'),
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }</li>
+    <li>Add the postgress database in settings.py. e.g<br/>
+        DATABASES = {<br/>
+            'default': {<br/>
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',<br/>
+                'NAME': env('DATABASE_NAME'),<br/>
+                'USER': env('DATABASE_USER'),<br/>
+                'PASSWORD': env('DATABASE_PASS'),<br/>
+                'HOST': 'localhost',<br/>
+                'PORT': '5432',<br/>
+            }<br/>
+        }<br/>
+    </li>
+    <li>After connecting the database apply the migrations using "python manage.py migrate" command</li>
+    <li>After migrations load dummy data to data using "python manage.py loaddata db_data.json" command.
+    <p>Super Admin email: admin@admin.com</p>
+    <p>Super Admin Password: Password@1</p>
+    </li>
 </ol>
 
