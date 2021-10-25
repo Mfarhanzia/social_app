@@ -12,10 +12,18 @@ class PostsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Posts
         fields = ("id", "user", "title", "detail", "post_image", "is_public", "created_at")
-        # ordering = ['created_at']
         
-
         extra_kwargs = {
             "created_at": {"read_only": True}
         }
 
+class PostsUserSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=False)
+    
+    class Meta:
+        model = Posts
+        fields = ("id", "user", "title", "detail", "post_image", "is_public", "created_at")
+        
+        extra_kwargs = {
+            "created_at": {"read_only": True}
+        }

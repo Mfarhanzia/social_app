@@ -1,10 +1,10 @@
 from django.db.models import Q, query
 from posts_app.models import Posts
 from rest_framework import generics, status
-from .serializers import PostsSerializer
 from user_app.models import Account as User
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from .serializers import PostsSerializer, PostsUserSerializer
 
 
 class PostsCustomPagination(PageNumberPagination):
@@ -33,7 +33,7 @@ class PostsView(generics.ListCreateAPIView):
 
 
 class GetFeedsView(generics.ListAPIView):
-    serializer_class = PostsSerializer
+    serializer_class = PostsUserSerializer
     pagination_class = PostsCustomPagination
 
     def get_queryset(self):
